@@ -4,6 +4,32 @@ const balanceEl = document.querySelector('.balance .value');
 const incomeTotalEl = document.querySelector('.outcome-total');
 const outcomeTotalEl = document.querySelector('income-total');
 const chartEl = document.querySelector('.chart');
+const canvas = documt.querySelector("canvas");
+
+canvas.width = 50;
+canvas.height = 50;
+
+chartEl.appendChild( canvas );
+const ctx = canvas.getContext("2d");
+ctx.arc(x, y, Radius, startAngle, endAngle, anticlockwise );
+
+const R = 20;
+
+function drawCircle( color, ratio, anticlockwise){
+  ctx.strokeStyle = color 
+  ctx.beginPath();
+  ctx.arc( cvs.width/2, cvs.height/2, R, 0, ratio * 2 * Math.PI, anticlockwise);
+}
+
+function updateChart(income, outcome){
+  ctx.clearRect(0,0, cvs.width, cvs.height);
+  let ratio = income/(income + outcome);
+  drawCircle("#FFFFFF", -ratio, true)
+  drawCircle("#F0624D", 1 - ratio, false)
+
+}
+
+
 
 // Dashboard buttons
 const expenseBtn = document.querySelector('.tab1');
@@ -35,6 +61,10 @@ const incomeAmount = document.getElementById('income-amount-input');
 const addExpense = document.querySelector('add-expense');
 const expenseTitle = document.getElementById('expense-title-input');
 const expenseAmount = document.getElementById('expense-amount-input');
+
+// Update chart elements
+
+
 
 // Functions chapter eventlisteners
 
