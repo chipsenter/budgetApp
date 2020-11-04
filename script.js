@@ -9,21 +9,22 @@ const canvas = documt.querySelector("canvas");
 canvas.width = 50;
 canvas.height = 50;
 
-chartEl.appendChild( canvas );
+chartEl.appendChild(canvas);
 const ctx = canvas.getContext("2d");
-ctx.arc(x, y, Radius, startAngle, endAngle, anticlockwise );
+ctx.arc(x, y, Radius, startAngle, endAngle, anticlockwise);
 
 const R = 20;
 
-function drawCircle( color, ratio, anticlockwise){
-  ctx.strokeStyle = color 
+function drawCircle(color, ratio, anticlockwise) {
+  ctx.strokeStyle = color
   ctx.beginPath();
-  ctx.arc( cvs.width/2, cvs.height/2, R, 0, ratio * 2 * Math.PI, anticlockwise);
+  ctx.arc(cvs.width / 2, cvs.height / 2, R, 0, ratio * 2 * Math.PI, anticlockwise);
 }
 
-function updateChart(income, outcome){
-  ctx.clearRect(0,0, cvs.width, cvs.height);
-  let ratio = income/(income + outcome);
+// Update chart elements
+function updateChart(income, outcome) {
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  let ratio = income / (income + outcome);
   drawCircle("#FFFFFF", -ratio, true)
   drawCircle("#F0624D", 1 - ratio, false)
 
@@ -36,15 +37,15 @@ const expenseBtn = document.querySelector('.tab1');
 const incomeBtn = document.querySelector('.tab2');
 const allBtn = document.querySelector('.tab3');
 
-      element.classList.remove("active");
-      element.classList.add("active");
+element.classList.remove("active");
+element.classList.add("active");
 
 const expenseEl = document.querySelector('#expense');
 const incomeEl = document.querySelector('#income');
 const allEl = document.querySelector('#all');
 
-    element.classList.remove("hide");
-    element.classList.add("hide");
+element.classList.remove("hide");
+element.classList.add("hide");
 
 // List items on dashboard
 const incomeList = document.querySelector('#income .list');
@@ -62,13 +63,10 @@ const addExpense = document.querySelector('add-expense');
 const expenseTitle = document.getElementById('expense-title-input');
 const expenseAmount = document.getElementById('expense-amount-input');
 
-// Update chart elements
-
-
 
 // Functions chapter eventlisteners
 
-expenseBtn.addEventListener('click', function(){
+expenseBtn.addEventListener('click', function () {
   active(expenseBtn);
   inactive([incomeBtn, allBtn]);
   show(expenseEl);
@@ -76,7 +74,7 @@ expenseBtn.addEventListener('click', function(){
 
 })
 
-incomeBtn.addEventListener('click', function(){
+incomeBtn.addEventListener('click', function () {
   active(incomeBtn);
   inactive([expenseBtn, allBtn]);
   show(incomeEl);
@@ -84,38 +82,78 @@ incomeBtn.addEventListener('click', function(){
 
 })
 
-allBtn.addEventListener('click', function(){
+allBtn.addEventListener('click', function () {
   active(allBtn);
   inactive([expenseBtn, incomeBtn]);
   show(allEl);
   hide([expenseEl, incomeEl]);
 
 })
+//**********************************************/
 
-function active( element ) {
+function active(element) {
   element.classList.add("active");
 }
 
-function show( element ) {
+function show(element) {
   element.classList.remove("hide");
 }
 
-function hide( elementsArray) {
+function hide(elementsArray) {
   elementsArray.forEach(element => {
     element.classList.add("hide");
   });
 }
 
-function inactive( elementsArray) {
+function inactive(elementsArray) {
   elementsArray.forEach(element => {
     element.classList.remove("active");
   });
 }
 
-function clearInput( inputsArray ) {
+function clearInput(inputsArray) {
   inputsArray.forEach(input => {
     input.value = "";
   });
+}
+
+// DELETE & EDIT ENTRY FUNCTIONS
+
+function deleteEntry(ENTRY) {
+  ENTRY_LIST.splice(ENTRY.id, 1);
+  updateUI();
+}
+incomeList.addEventListener('click', deleteOrEdit);
+expenseList.addEventListener('click', deleteOrEdit);
+allList.addEventListener('click', deleteOrEdit);
+
+function deleteOrEdit(event){
+
+  const targetBtn = event.target;
+  const ENTRY = targetBtn.parentNode;
+
+  if(targetBtn.id == "delete"){
+    deleteEntry(ENTRY);
+  }else if(targetBtn.id == "edit"){
+    editEntry(ENTRY);
+  }
+}
+
+// EDIT ENTRY FUNCTION
+
+function editEntry(ENTRY) {
+
+  let entry = ENTRY_LIST[ENTRY.id];
+
+  if (entry.type == "income") {
+    incomeAmount.value = entry.amount;
+    incomeTitle.value = entry.title;
+
+  } else if (entry.type == "expense") {
+    expenseAmount.value = entry.amount;
+    expenseTitle.value = entry.title;
+  }
+  deleteEntry(ENTRY);
 }
 
 function updateUI() {
@@ -125,55 +163,55 @@ function updateUI() {
 
   let sign = (income >= outcome) ? "$" : "$";
 
-balanceEl.innerHTML = `<small>${sign}</small>${balance}`;
-incomeEl.innerHTML = `<small>$</small>${income}`;
-outcomeTotalEl.innerHTML = `<small>$</small>${outcome}`;
+  balanceEl.innerHTML = `<small>${sign}</small>${balance}`;
+  incomeEl.innerHTML = `<small>$</small>${income}`;
+  outcomeTotalEl.innerHTML = `<small>$</small>${outcome}`;
 
-clearElement([incomeList, expenseList, allList]);
+  clearElement([incomeList, expenseList, allList]);
 
-ENTRY_LIST.forEach( (entry, index) => {
-  if(entry.type == "income"){
-    showEntry(incomeList, entry.type, entry.title, entry.amount, index);
-  } else if(entry.type == "expense"){
-    showEntry(expenseList, entry.type, entry.title, entry.amount, index);
-  }
-  showEntry(allList, entry.type, entry.title, entry.amount, index);
-});
-  updateChart( income, outcome);
+  ENTRY_LIST.forEach((entry, index) => {
+    if (entry.type == "income") {
+      showEntry(incomeList, entry.type, entry.title, entry.amount, index);
+    } else if (entry.type == "expense") {
+      showEntry(expenseList, entry.type, entry.title, entry.amount, index);
+    }
+    showEntry(allList, entry.type, entry.title, entry.amount, index);
+  });
+  updateChart(income, outcome);
 }
 
 let ENTRY_LIST = [];
 
-addIncome.addEventListener("click", function(){
-  if( !incomeTitle.value || !incomeAmount.value ) return;
+addIncome.addEventListener("click", function () {
+  if (!incomeTitle.value || !incomeAmount.value) return;
   let income = {
-    type : "income",
-    title : incomeTitle.value,
-    amount : parseFloat(incomeAmount.value),
+    type: "income",
+    title: incomeTitle.value,
+    amount: parseFloat(incomeAmount.value),
   }
-  ENTRY_LIST.push( income );
+  ENTRY_LIST.push(income);
   updateUI();
-  clearInput( [incomeTitle, incomeAmount]);
+  clearInput([incomeTitle, incomeAmount]);
 
 })
 
-addExpense.addEventListener("click", function(){
-  if( !expenseTitle.value || !expenseAmount.value ) return;
+addExpense.addEventListener("click", function () {
+  if (!expenseTitle.value || !expenseAmount.value) return;
   let expense = {
-    type : "expense",
-    title : expenseTitle.value,
-    amount : parseFloat(expenseAmount.value),
+    type: "expense",
+    title: expenseTitle.value,
+    amount: parseFloat(expenseAmount.value),
   }
-  ENTRY_LIST.push( expense );
+  ENTRY_LIST.push(expense);
   updateUI();
-  clearInput( [expenseTitle, expenseAmount]);
+  clearInput([expenseTitle, expenseAmount]);
 
 })
 
-function calculateTotal( type, ENTRY_LIST) {
+function calculateTotal(type, ENTRY_LIST) {
   let sum = 0;
-  ENTRY_LIST.forEach( entry => {
-    if( entry.type == type) {
+  ENTRY_LIST.forEach(entry => {
+    if (entry.type == type) {
       sum += entry.amount;
     }
   });
@@ -195,7 +233,7 @@ function showEntry(list, type, title, amount, id) {
                           <div id="edit"></div>
                           <div id="delete"></div>
                 </li> `;
-  
+
   const position = "afterbegin";
   list.insertAdjacentHTML(position, entry);
 }
